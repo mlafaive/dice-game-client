@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Game, Player, getGame } from '../services/api';
+import { Game, getGame } from '../services/api';
 import { GamePollingInterval } from '../constants';
-import useCookie, { updateItem } from 'react-use-cookie';
+import useCookie from 'react-use-cookie';
 
 export function useGame(id: string): [Game | undefined, (newGame?: Game) => void] {
   const [game, setGame] = useState<Game | undefined>();
