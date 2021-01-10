@@ -1,7 +1,7 @@
 export enum Paths {
   Home = '/',
   NewGame = '/games/new',
-  Games = '/games/:id'
+  Games = '/games/:gameId'
 }
 
 export const ApiBasePath = 'https://dice-game-service.herokuapp.com';
@@ -81,3 +81,5 @@ export enum USMapNodeId {
   WV = 'WV',
   WY = 'WY',
 }
+
+export const GamePollingInterval = 5000;

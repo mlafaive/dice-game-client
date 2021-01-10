@@ -1,37 +1,29 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
-import { createGame } from '../services/api';
-import { useHistory } from 'react-router-dom';
+import { useGameContext } from './game-provider';
 
-export default function NewGame() {
-  const [gameName, setGameName] = useState('');
+export default function JoinGame() {
   const [playerName, setPlayerName] = useState('');
-  const [isCreatingGame, setIsCreatingGame] = useState(false);
+  const [isCreatingPlayer, setIsCreatingPlayer] = useState(false);
   const [errorText, setErrorText] = useState('');
-  const history = useHistory();
 
-  async function createGameHandler() {
-    setIsCreatingGame(true);
+  const { createPlayer } = useGameContext();
+
+  async function createPlayerHandler() {
+    setIsCreatingPlayer(true);
 
     try {
-      const { _id } = await createGame(gameName, playerName);
-      history.push(`/games/${_id}`);
+      await createPlayer(playerName);
     } catch (error) {
       console.error(error);
-      setIsCreatingGame(false);
-      setErrorText('Could not create game. Please try again later');
-    }   
-  }
-
-  function createInputHandler(
-    setStateFunc: (input: string) => void
-  ): (event: ChangeEvent<HTMLInputElement>) => void {
-    return (event) => setStateFunc(event.target.value);
+      setErrorText('Could not create player. Please try again later');
+      setIsCreatingPlayer(false);
+    }
   }
 
   return (
@@ -39,31 +31,22 @@ export default function NewGame() {
       <Row className='min-vh-100 align-items-center'>
         <Col>
           <Row className='justify-content-center'>
-            <h1>Create new game</h1>
+            <h1>Create new player</h1>
           </Row>
           <Row className='justify-content-center text-center'>
             <Form>
-              <Form.Group controlId='gameName' className='text-left'>
-                <Form.Label>Game name</Form.Label>
-                <Form.Control 
-                  value={gameName} 
-                  onChange={createInputHandler(setGameName)}
-                  disabled={isCreatingGame}
-                />
-              </Form.Group>
-
               <Form.Group controlId='playerName' className='text-left'>
                 <Form.Label>Player name</Form.Label>
                 <Form.Control
                   value={playerName}
-                  onChange={createInputHandler(setPlayerName)}
-                  disabled={isCreatingGame}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  disabled={isCreatingPlayer}
                 />
               </Form.Group>
 
               <Form.Group>
-                <Button variant='primary' onClick={createGameHandler}>
-                  {isCreatingGame ?
+                <Button variant='primary' onClick={createPlayerHandler}>
+                  {isCreatingPlayer ?
                     <>
                       <Spinner
                         as='span'
@@ -74,7 +57,7 @@ export default function NewGame() {
                       <span className='sr-only'>Loading...</span>
                     </>
                     :
-                    'Create game'
+                    'Create player'
                   }
                 </Button>
                 <Form.Control.Feedback type='invalid'>

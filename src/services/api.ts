@@ -2,7 +2,8 @@ import { DieColor, DieStatus, GameStatus, ApiBasePath, USMapNodeId } from '../co
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: ApiBasePath
+  baseURL: ApiBasePath,
+  withCredentials: true,
 });
 
 axiosInstance.interceptors.response.use(
@@ -18,12 +19,14 @@ export interface PlayerMapNode {
 }
 
 export interface Die extends Document {
+  _id: string;
   color: DieColor;
   status: DieStatus;
   value: number;
 }
 
 export interface Player {
+  _id: string;
   name: string;
   dupesRemaining: number;
   colorChangesRemaining: number;
@@ -33,6 +36,7 @@ export interface Player {
 }
 
 export interface Game {
+  _id: string;
   name: string;
   dice: Die[];
   status: GameStatus;
@@ -52,8 +56,8 @@ export interface PlayerMove {
   dupeMoveNodeId?: USMapNodeId;
 }
 
-export async function getGame(id: string): Promise<Game> {
-  return axiosInstance.get<any, Game>(`/games/${id}`);
+export async function getGame(gameId: string): Promise<Game> {
+  return axiosInstance.get<any, Game>(`/games/${gameId}`);
 }
 
 export async function createGame(gameName: string, playerName: string): Promise<Game> {
@@ -61,22 +65,22 @@ export async function createGame(gameName: string, playerName: string): Promise<
 }
 
 export async function createPlayer(gameId: string, playerName: string): Promise<Game> {
-  return axiosInstance.post<any, Game>(`/players`, { gameId, playerName });
+  return axiosInstance.post<any, Game>(`/games/${gameId}/players`, { playerName });
 }
 
 export async function makePlayerMove(
-  gameId: string, playerId: string, playerMoves: PlayerMove[]
+  gameId: string, playerMoves: PlayerMove[]
 ): Promise<Game> {
   return axiosInstance.patch<any, Game>(
-    `/players/${playerId}`,
-    { gameId, playerMoves },
+    `/games/${gameId}/move`,
+    { playerMoves },
   );
 }
 
-export async function startGame(id: string): Promise<Game> {
-  return axiosInstance.post<any, Game>(`/games/${id}/start`);
+export async function startGame(gameId: string): Promise<Game> {
+  return axiosInstance.post<any, Game>(`/games/${gameId}/start`);
 }
 
-export async function rollDice(gameId: string, playerId: string): Promise<Game> {
-  return axiosInstance.post<any, Game>(`/games/${gameId}/roll`, { playerId });
+export async function rollDice(gameId: string): Promise<Game> {
+  return axiosInstance.post<any, Game>(`/games/${gameId}/roll`);
 }
